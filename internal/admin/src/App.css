@@ -521,6 +521,8 @@
   border-top: 1px solid var(--border-color);
   padding-top: 0.8rem;
   display: grid;
+  grid-auto-flow: row;
+  /* Left-to-right, then next row */
   gap: 0 1.5rem;
 }
 
