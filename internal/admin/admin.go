@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v5"
+	"github.com/pgvector/pgvector-go"
 
 	"jarvis-memory/internal/db"
 )
@@ -78,7 +79,7 @@ func (h *AdminHandler) HandleAdminData(c *echo.Context) error {
 }
 
 func (h *AdminHandler) getLatestSeeds(ctx context.Context) ([]db.Seed, error) {
-	query := `SELECT id, content, title, type, confidence, protected, last_accessed, created_at FROM seeds ORDER BY created_at DESC LIMIT 100`
+	query := `SELECT id, content, title, type, confidence, protected, last_accessed, created_at, embedding FROM seeds ORDER BY created_at DESC LIMIT 100`
 	rows, err := h.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -89,9 +90,11 @@ func (h *AdminHandler) getLatestSeeds(ctx context.Context) ([]db.Seed, error) {
 	for rows.Next() {
 		var s db.Seed
 		var lastAccessed sql.NullTime
-		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &s.Protected, &lastAccessed, &s.CreatedAt); err != nil {
+		var vec pgvector.Vector
+		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &s.Protected, &lastAccessed, &s.CreatedAt, &vec); err != nil {
 			return nil, err
 		}
+		s.Embedding = vec.Slice()
 		if lastAccessed.Valid {
 			s.LastAccessed = lastAccessed.Time
 		} else {
@@ -103,5 +106,30 @@ func (h *AdminHandler) getLatestSeeds(ctx context.Context) ([]db.Seed, error) {
 }
 
 func (h *AdminHandler) getLatestAgentContexts(ctx context.Context) ([]db.AgentContext, error) {
-	return h.db.GetAgentContexts(ctx, "")
+	query := `SELECT id, agent_id, type, metadata, summary, created_at, embedding FROM agent_contexts ORDER BY created_at DESC`
+	rows, err := h.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []db.AgentContext
+	for rows.Next() {
+		var ac db.AgentContext
+		var meta []byte
+		var sum sql.NullString
+		var vec pgvector.Vector
+		if err := rows.Scan(&ac.ID, &ac.AgentID, &ac.Type, &meta, &sum, &ac.CreatedAt, &vec); err != nil {
+			return nil, err
+		}
+		if meta != nil {
+			ac.Metadata = meta
+		}
+		if sum.Valid {
+			ac.Summary = sum.String
+		}
+		ac.Embedding = vec.Slice()
+		results = append(results, ac)
+	}
+	return results, nil
 }

@@ -19,6 +19,7 @@ type Seed struct {
 	Protected    bool      `json:"protected"`
 	LastAccessed time.Time `json:"last_accessed"`
 	CreatedAt    time.Time `json:"created_at"`
+	Embedding    []float32 `json:"embedding,omitempty"`
 }
 
 func (db *DB) ListSeeds(ctx context.Context, limit int) ([]Seed, error) {
@@ -192,6 +193,7 @@ type AgentContext struct {
 	Metadata  json.RawMessage `json:"metadata"`
 	Summary   string          `json:"summary"`
 	CreatedAt time.Time       `json:"created_at"`
+	Embedding []float32       `json:"embedding,omitempty"`
 }
 
 func (db *DB) InsertAgentContext(ctx context.Context, ac *AgentContext, embedding []float32) error {

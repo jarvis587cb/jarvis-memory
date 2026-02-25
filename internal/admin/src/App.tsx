@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import NeuralMap from './NeuralMap'
 import './App.css'
 
 interface Seed {
@@ -10,6 +11,7 @@ interface Seed {
   protected: boolean
   last_accessed: string
   created_at: string
+  embedding?: number[]
 }
 
 interface AgentContext {
@@ -19,6 +21,7 @@ interface AgentContext {
   metadata: Record<string, unknown> | null
   summary: string
   created_at: string
+  embedding?: number[]
 }
 
 interface AdminData {
@@ -26,7 +29,7 @@ interface AdminData {
   agentContexts: AgentContext[]
 }
 
-type Tab = 'seeds' | 'contexts'
+type Tab = 'seeds' | 'contexts' | 'map'
 type SortDir = 'asc' | 'desc'
 
 interface SortState<K extends string> {
@@ -319,10 +322,17 @@ function App() {
         >
           🧠 Agent Contexts <span className="tab-count">{contexts.length}</span>
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'map' ? 'active' : ''}`}
+          onClick={() => setActiveTab('map')}
+        >
+          🕸️ Neural Map
+        </button>
       </div>
 
       {activeTab === 'seeds' && <SeedsTable seeds={seeds} />}
       {activeTab === 'contexts' && <ContextsTable contexts={contexts} />}
+      {activeTab === 'map' && <NeuralMap seeds={seeds} contexts={contexts} />}
     </div>
   )
 }
