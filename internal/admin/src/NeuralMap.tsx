@@ -365,18 +365,50 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
 
                     <div className="tooltip-synapses">
                         <div className="synapses-header">Synapsen:</div>
-                        {edgesRef.current
-                            .filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id)
-                            .sort((a, b) => b.strength - a.strength)
-                            .map(e => {
-                                const target = e.source.id === hoveredNode.id ? e.target : e.source;
-                                return (
-                                    <div key={target.id} className="synapse-item">
-                                        <span className="synapse-label">{target.label}</span>
-                                        <span className="synapse-strength">{(e.strength * 100).toFixed(0)}%</span>
-                                    </div>
-                                );
-                            })}
+                        {(() => {
+                            const filtered = edgesRef.current
+                                .filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id)
+                                .sort((a, b) => b.strength - a.strength);
+
+                            const count = filtered.length;
+                            const isWider = count > 10;
+
+                            if (!isWider) {
+                                return filtered.map(e => {
+                                    const target = e.source.id === hoveredNode.id ? e.target : e.source;
+                                    return (
+                                        <div key={target.id} className="synapse-item">
+                                            <span className="synapse-label">{target.label}</span>
+                                            <span className="synapse-strength">{(e.strength * 100).toFixed(0)}%</span>
+                                        </div>
+                                    );
+                                });
+                            }
+
+                            // Vertical flow logic for 3 columns:
+                            // We want to map original indices [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                            // to a layout:
+                            // Row 0: index 0, index rowCount, index 2*rowCount
+                            // Row 1: index 1, index rowCount+1, index 2*rowCount+1
+                            // ...
+                            const rowCount = Math.ceil(count / 3);
+                            const displayed: React.ReactNode[] = [];
+                            for (let i = 0; i < rowCount; i++) {
+                                [i, i + rowCount, i + 2 * rowCount].forEach(index => {
+                                    if (index < count) {
+                                        const e = filtered[index];
+                                        const target = e.source.id === hoveredNode.id ? e.target : e.source;
+                                        displayed.push(
+                                            <div key={target.id} className="synapse-item">
+                                                <span className="synapse-label">{target.label}</span>
+                                                <span className="synapse-strength">{(e.strength * 100).toFixed(0)}%</span>
+                                            </div>
+                                        );
+                                    }
+                                });
+                            }
+                            return displayed;
+                        })()}
                     </div>
                 </div>
             )}
