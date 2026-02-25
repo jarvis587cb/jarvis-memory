@@ -435,7 +435,9 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 280px;
+  width: auto;
+  min-width: 280px;
+  max-width: calc(100vw - 2rem);
   background: var(--bg-card);
   border: 1px solid var(--border-active);
   border-radius: var(--radius-md);
@@ -444,13 +446,19 @@
   pointer-events: none;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  word-wrap: break-word;
+  transition: min-width 0.3s ease;
 }
 
 .node-tooltip.wider {
+  min-width: 500px;
+}
+
+.node-tooltip.is-clamped {
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   width: 600px;
+  pointer-events: auto;
+  /* Allow scrolling */
 }
 
 @keyframes fadeIn {
@@ -490,14 +498,13 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 0.8rem;
-  word-break: break-word;
+  white-space: pre;
+  /* No wrapping by default */
+}
+
+.is-clamped .tooltip-content {
   white-space: pre-wrap;
-  display: -webkit-box;
-  line-clamp: 6;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .tooltip-synapses {
@@ -531,10 +538,7 @@
 
 .synapse-label {
   color: var(--accent-indigo);
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 150px;
 }
 
 .synapse-strength {

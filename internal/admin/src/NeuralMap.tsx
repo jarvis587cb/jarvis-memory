@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useLayoutEffect } from 'react';
 
 interface Node {
     id: string;
@@ -43,11 +43,29 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
     const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
     const nodesRef = useRef<Node[]>([]);
     const edgesRef = useRef<Edge[]>([]);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const [isClamped, setIsClamped] = useState(false);
 
     // Camera state: x, y is translation, k is scale
     const cameraRef = useRef({ x: 0, y: 0, k: 1 });
     const isDraggingRef = useRef(false);
     const lastMousePosRef = useRef({ x: 0, y: 0 });
+
+    // Detect if tooltip overflows viewport height
+    useLayoutEffect(() => {
+        if (hoveredNode && tooltipRef.current) {
+            const rect = tooltipRef.current.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            // If tooltip height exceeds 90% of viewport or absolute height
+            if (rect.height > viewportHeight * 0.9) {
+                setIsClamped(true);
+            } else {
+                setIsClamped(false);
+            }
+        } else {
+            setIsClamped(false);
+        }
+    }, [hoveredNode]);
 
     // Initialize nodes and edges
     useEffect(() => {
@@ -353,7 +371,10 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                 🖱️ Ziehen zum Bewegen | ⚙️ Scrollen zum Zoomen
             </div>
             {hoveredNode && (
-                <div className={`node-tooltip ${edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id).length > 10 ? 'wider' : ''}`}>
+                <div
+                    ref={tooltipRef}
+                    className={`node-tooltip ${isClamped ? 'is-clamped' : ''}`}
+                >
                     <div className="tooltip-header">
                         <span className={`badge badge-${hoveredNode.type}`}>
                             {hoveredNode.type === 'seed' ? '🌱 Seed' : '🧠 Context'}
