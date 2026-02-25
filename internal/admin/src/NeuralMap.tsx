@@ -384,11 +384,9 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                         const connections = edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id);
                         if (connections.length === 0) return null;
 
-                        // Calculate dynamic columns (1-5) based on connection count
+                        // Calculate dynamic columns (1-3) based on connection count
                         let cols = 1;
-                        if (connections.length > 40) cols = 5;
-                        else if (connections.length > 20) cols = 4;
-                        else if (connections.length > 10) cols = 3;
+                        if (connections.length > 10) cols = 3;
                         else if (connections.length > 5) cols = 2;
 
                         return (

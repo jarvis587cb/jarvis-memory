@@ -538,16 +538,6 @@
   min-width: 600px;
 }
 
-.tooltip-synapses.cols-4 {
-  column-count: 4;
-  min-width: 800px;
-}
-
-.tooltip-synapses.cols-5 {
-  column-count: 5;
-  min-width: 1000px;
-}
-
 .synapses-header {
   column-span: all;
   font-size: 0.7rem;
