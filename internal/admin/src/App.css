@@ -495,7 +495,14 @@
   padding-top: 0.8rem;
 }
 
+.wider .tooltip-synapses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+}
+
 .synapses-header {
+  grid-column: 1 / -1;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
