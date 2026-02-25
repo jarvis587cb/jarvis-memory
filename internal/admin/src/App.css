@@ -481,14 +481,7 @@
 .tooltip-content {
   font-size: 0.8rem;
   color: var(--text-secondary);
-  max-height: 150px;
-  overflow-y: auto;
   line-height: 1.4;
-}
-
-.table-tooltip .tooltip-content {
-  max-height: none;
-  overflow-y: visible;
 }
 
 .neural-map-legend {
