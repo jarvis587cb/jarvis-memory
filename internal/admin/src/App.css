@@ -530,6 +530,21 @@
   background: rgba(99, 102, 241, 0.6);
 }
 
+.neural-controls-hint {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(15, 17, 23, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 10;
+}
+
 .badge-seed {
   background: var(--accent-indigo-soft);
   color: var(--accent-indigo);
