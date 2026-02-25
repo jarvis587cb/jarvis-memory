@@ -186,14 +186,37 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
             ctx.scale(camera.k, camera.k);
 
             // Draw edges (Synapses)
-            ctx.lineWidth = 1 / camera.k;
-            for (const edge of currentEdges) {
+            const drawEdge = (edge: Edge, opacity: number, width: number, color: string) => {
                 ctx.beginPath();
-                const opacity = 0.1 + edge.strength * 0.4;
-                ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
+                ctx.lineWidth = width / camera.k;
+                ctx.strokeStyle = color.replace('ALPHA', opacity.toString());
                 ctx.moveTo(edge.source.x, edge.source.y);
                 ctx.lineTo(edge.target.x, edge.target.y);
                 ctx.stroke();
+            };
+
+            const edgeBaseColor = 'rgba(99, 102, 241, ALPHA)';
+            const edgeHighlightColor = 'rgba(165, 180, 252, ALPHA)';
+
+            // Pass 1: Draw non-connected edges
+            for (const edge of currentEdges) {
+                const isConnected = hoveredNode && (edge.source.id === hoveredNode.id || edge.target.id === hoveredNode.id);
+                if (isConnected) continue;
+
+                const baseOpacity = 0.1 + edge.strength * 0.4;
+                const opacity = hoveredNode ? baseOpacity * 0.3 : baseOpacity;
+                drawEdge(edge, opacity, 1, edgeBaseColor);
+            }
+
+            // Pass 2: Draw connected edges
+            if (hoveredNode) {
+                for (const edge of currentEdges) {
+                    const isConnected = edge.source.id === hoveredNode.id || edge.target.id === hoveredNode.id;
+                    if (!isConnected) continue;
+
+                    const opacity = 0.6 + edge.strength * 0.3;
+                    drawEdge(edge, opacity, 2, edgeHighlightColor);
+                }
             }
 
             // Draw nodes (Neurons)
