@@ -501,7 +501,12 @@
 
 .tooltip-content {
   font-size: 0.8rem;
+  font-family: monospace;
   color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
   line-height: 1.4;
   margin-bottom: 0.8rem;
   display: -webkit-box;
@@ -510,6 +515,17 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
+}
+
+.tooltip-content p,
+.tooltip-content pre,
+.tooltip-content code {
+  margin: 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .tooltip-synapses {
