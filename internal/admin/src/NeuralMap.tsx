@@ -44,6 +44,11 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
     const nodesRef = useRef<Node[]>([]);
     const edgesRef = useRef<Edge[]>([]);
 
+    // Camera state: x, y is translation, k is scale
+    const cameraRef = useRef({ x: 0, y: 0, k: 1 });
+    const isDraggingRef = useRef(false);
+    const lastMousePosRef = useRef({ x: 0, y: 0 });
+
     // Initialize nodes and edges
     useEffect(() => {
         const newNodes: Node[] = [
@@ -93,6 +98,15 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
 
         nodesRef.current = newNodes;
         edgesRef.current = newEdges;
+
+        // Reset camera once on data load
+        if (containerRef.current) {
+            cameraRef.current = {
+                x: containerRef.current.clientWidth / 2 - 400,
+                y: containerRef.current.clientHeight / 2 - 300,
+                k: 1
+            };
+        }
     }, [seeds, contexts]);
 
     // Animation loop
@@ -108,8 +122,8 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
             const currentNodes = nodesRef.current;
             const currentEdges = edgesRef.current;
 
-            const width = canvas.width;
-            const height = canvas.height;
+            const width = 800; // Reference width for physics
+            const height = 600;
 
             // Force physics
             for (let i = 0; i < currentNodes.length; i++) {
@@ -157,23 +171,22 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                 node.y += node.vy;
                 node.vx *= 0.9; // Friction
                 node.vy *= 0.9;
-
-                // Bounds
-                if (node.x < 20) node.x = 20;
-                if (node.x > width - 20) node.x = width - 20;
-                if (node.y < 20) node.y = 20;
-                if (node.y > height - 20) node.y = height - 20;
             }
         };
 
         const draw = () => {
             const currentNodes = nodesRef.current;
             const currentEdges = edgesRef.current;
+            const camera = cameraRef.current;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            ctx.save();
+            ctx.translate(camera.x, camera.y);
+            ctx.scale(camera.k, camera.k);
+
             // Draw edges (Synapses)
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1 / camera.k;
             for (const edge of currentEdges) {
                 ctx.beginPath();
                 const opacity = 0.1 + edge.strength * 0.4;
@@ -201,14 +214,16 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                 ctx.arc(node.x, node.y, hoveredNode?.id === node.id ? 6 : 4, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Label if high enough zoom or hovered
+                // Label if hovered
                 if (hoveredNode?.id === node.id) {
                     ctx.fillStyle = '#fff';
-                    ctx.font = '12px Inter';
+                    ctx.font = `${12 / camera.k}px Inter`;
                     ctx.textAlign = 'center';
-                    ctx.fillText(node.label, node.x, node.y - 20);
+                    ctx.fillText(node.label, node.x, node.y - 20 / camera.k);
                 }
             }
+
+            ctx.restore();
         };
 
         const render = () => {
@@ -235,17 +250,37 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const screenToWorld = (sx: number, sy: number) => {
+        const camera = cameraRef.current;
+        return {
+            x: (sx - camera.x) / camera.k,
+            y: (sy - camera.y) / camera.k
+        };
+    };
+
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!canvasRef.current) return;
         const rect = canvasRef.current.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
 
+        if (isDraggingRef.current) {
+            const dx = e.clientX - lastMousePosRef.current.x;
+            const dy = e.clientY - lastMousePosRef.current.y;
+            cameraRef.current.x += dx;
+            cameraRef.current.y += dy;
+            lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+            return;
+        }
+
+        const worldPos = screenToWorld(mx, my);
         let found = null;
         for (const node of nodesRef.current) {
-            const dx = node.x - mx;
-            const dy = node.y - my;
-            if (dx * dx + dy * dy < 400) {
+            const dx = node.x - worldPos.x;
+            const dy = node.y - worldPos.y;
+            // Radius of hit detection should also scale with zoom so it matches the visual size
+            const radius = 15;
+            if (dx * dx + dy * dy < radius * radius) {
                 found = node;
                 break;
             }
@@ -253,13 +288,47 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
         setHoveredNode(found);
     };
 
+    const handleMouseDown = (e: React.MouseEvent) => {
+        isDraggingRef.current = true;
+        lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleMouseUp = () => {
+        isDraggingRef.current = false;
+    };
+
+    const handleWheel = (e: React.WheelEvent) => {
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        const delta = -e.deltaY;
+        const zoomFactor = Math.pow(1.1, delta / 100);
+
+        const camera = cameraRef.current;
+        const nextK = Math.max(0.1, Math.min(10, camera.k * zoomFactor));
+        const actualFactor = nextK / camera.k;
+
+        camera.x = mx - (mx - camera.x) * actualFactor;
+        camera.y = my - (my - camera.y) * actualFactor;
+        camera.k = nextK;
+    };
+
     return (
         <div className="neural-map-container" ref={containerRef}>
             <canvas
                 ref={canvasRef}
                 onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onWheel={handleWheel}
                 className="neural-canvas"
             />
+            <div className="neural-controls-hint">
+                🖱️ Ziehen zum Bewegen | ⚙️ Scrollen zum Zoomen
+            </div>
             {hoveredNode && (
                 <div className="node-tooltip">
                     <div className="tooltip-header">
