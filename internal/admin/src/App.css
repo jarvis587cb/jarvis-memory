@@ -444,6 +444,11 @@
   pointer-events: none;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
+  transition: width 0.3s ease;
+}
+
+.node-tooltip.wider {
+  width: 450px;
 }
 
 @keyframes fadeIn {

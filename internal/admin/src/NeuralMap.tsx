@@ -353,7 +353,7 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                 🖱️ Ziehen zum Bewegen | ⚙️ Scrollen zum Zoomen
             </div>
             {hoveredNode && (
-                <div className="node-tooltip">
+                <div className={`node-tooltip ${edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id).length > 10 ? 'wider' : ''}`}>
                     <div className="tooltip-header">
                         <span className={`badge badge-${hoveredNode.type}`}>
                             {hoveredNode.type === 'seed' ? '🌱 Seed' : '🧠 Context'}
