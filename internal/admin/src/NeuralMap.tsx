@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState, useLayoutEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
 
 interface Node {
     id: string;
@@ -379,9 +378,7 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                         <span className="tooltip-id">{hoveredNode.id.slice(0, 8)}</span>
                     </div>
                     <div className="tooltip-title">{hoveredNode.label}</div>
-                    <div className="tooltip-content">
-                        <ReactMarkdown>{hoveredNode.content || ''}</ReactMarkdown>
-                    </div>
+                    <div className="tooltip-content">{hoveredNode.content}</div>
 
                     {(() => {
                         const connections = edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id);

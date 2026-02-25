@@ -517,17 +517,6 @@
   word-break: break-word;
 }
 
-.tooltip-content p,
-.tooltip-content pre,
-.tooltip-content code {
-  margin: 0;
-  font-family: inherit;
-  white-space: pre-wrap;
-  background: transparent;
-  padding: 0;
-  border: none;
-}
-
 .tooltip-synapses {
   border-top: 1px solid var(--border-color);
   padding-top: 0.8rem;
