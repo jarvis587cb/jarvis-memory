@@ -18,9 +18,22 @@ A lightweight, purely Go-based long-term memory system for AI agents. Uses a loc
 | 🔄 **Auto-Recall** | Automatically queries relevant memories before each AI turn (OpenClaw hook) |
 | 💾 **Auto-Capture** | Automatically saves conversations after each AI turn (OpenClaw hook) |
 | ✏️ **Full CRUD** | Create, Read, Update, Delete seeds via REST API |
-| 🖥️ **Admin Panel** | React dashboard with Seeds & Agent Contexts tables, manual sorting, and confidence indicators |
+| 🕸️ **Neural Map** | 3D-feeling interactive visualization of the memory network with Pan & Zoom |
+| 🖥️ **Admin Panel** | React dashboard with rich tooltips, manual table sorting, and live network graph |
 | 🐳 **Dockerized** | One-command setup with Docker Compose (Go app + Postgres/pgvector) |
 | 🔒 **100% Local** | No API keys, no external services, complete privacy |
+
+---
+
+## 🕸️ Neural Map Visualization
+
+Jarvis Memory includes an interactive visualization layer that treats your seeds as neurons in a biological brain.
+
+- **Synapses**: Lines (synapses) are automatically drawn between nodes that share a high semantic similarity.
+- **Interactive Graph**: A force-directed layout ensures the map remains readable and evolves as new memories are added.
+- **Pan & Zoom**: Intuitive navigation using mouse dragging and scroll wheel (zoom-to-cursor).
+- **Rich Tooltips**: Hover over any node to see its full content, metadata, and a detailed list of all its synaptic connections (sorted by similarity).
+- **Glow Effects**: Visual distinction between **Seeds** (Neurons) and **Agent Contexts** (Context Modules).
 
 ---
 
@@ -62,6 +75,9 @@ make test
 ```
 
 Open the Admin Dashboard: **http://localhost:8080/admin**
+
+> [!TIP]
+> Use the **Neural Map** tab to explore the semantic relationships between your memories. Hover over neurons to see "Synapses" (similar memories) listed in the tooltip.
 
 ---
 
