@@ -51,17 +51,13 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
     const isDraggingRef = useRef(false);
     const lastMousePosRef = useRef({ x: 0, y: 0 });
 
-    // Detect if tooltip overflows viewport height
+    // Detect if tooltip overflows container height
     useLayoutEffect(() => {
-        if (hoveredNode && tooltipRef.current) {
-            const rect = tooltipRef.current.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            // If tooltip height exceeds 90% of viewport or absolute height
-            if (rect.height > viewportHeight * 0.9) {
-                setIsClamped(true);
-            } else {
-                setIsClamped(false);
-            }
+        if (hoveredNode && tooltipRef.current && containerRef.current) {
+            const containerHeight = containerRef.current.clientHeight;
+            const tooltipHeight = tooltipRef.current.scrollHeight;
+            // Clamp if tooltip would exceed container (minus padding)
+            setIsClamped(tooltipHeight > containerHeight - 32);
         } else {
             setIsClamped(false);
         }

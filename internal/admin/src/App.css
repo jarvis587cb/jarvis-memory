@@ -467,9 +467,8 @@
 
 .node-tooltip.is-clamped {
   max-height: calc(100% - 2rem);
-  overflow-y: auto;
-  pointer-events: auto;
-  /* Allow scrolling */
+  overflow: hidden;
+  /* Truncate, don't scroll */
 }
 
 @keyframes fadeIn {
