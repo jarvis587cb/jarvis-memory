@@ -503,10 +503,6 @@
   font-size: 0.8rem;
   font-family: monospace;
   color: var(--text-secondary);
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem;
   line-height: 1.4;
   margin-bottom: 0.8rem;
   display: -webkit-box;
