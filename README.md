@@ -18,7 +18,7 @@ A lightweight, purely Go-based long-term memory system for AI agents. Uses a loc
 | 🔄 **Auto-Recall** | Automatically queries relevant memories before each AI turn (OpenClaw hook) |
 | 💾 **Auto-Capture** | Automatically saves conversations after each AI turn (OpenClaw hook) |
 | ✏️ **Full CRUD** | Create, Read, Update, Delete seeds via REST API |
-| 🖥️ **Admin Panel** | Dark-themed dashboard with edit/delete buttons, confidence sliders, and live search |
+| 🖥️ **Admin Panel** | React dashboard with Seeds & Agent Contexts tables, manual sorting, and confidence indicators |
 | 🐳 **Dockerized** | One-command setup with Docker Compose (Go app + Postgres/pgvector) |
 | 🔒 **100% Local** | No API keys, no external services, complete privacy |
 
@@ -92,7 +92,8 @@ Open the Admin Dashboard: **http://localhost:8080/admin**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/admin` | 📊 Admin dashboard with tables, charts, and CRUD controls |
+| `GET` | `/admin` | 📊 Admin dashboard (SPA) for monitoring Seeds and Agent Contexts |
+| `GET` | `/admin/api/data` | 📡 JSON data source for the admin dashboard |
 
 ---
 
@@ -254,8 +255,9 @@ jarvis-memory/
 │   │   ├── db.go                   # 🗄️ Connection, migrations, decay
 │   │   └── store.go                # 💾 Data access layer (CRUD + search)
 │   ├── 📂 admin/
-│   │   ├── admin.go                # 🖥️ Admin panel handler
-│   │   └── templates/index.html    # 🎨 Admin UI (dark theme + modals)
+│   │   ├── admin.go                # 🖥️ Admin panel handler & JSON API
+│   │   ├── dist/                   # 📦 Built React frontend (embedded)
+│   │   └── src/                    # ⚛️ React source code (TypeScript + Vite)
 │   └── 📂 embeddings/
 │       └── embeddings.go           # 🧮 GTE-Small embedding service
 ├── 📂 hooks/
