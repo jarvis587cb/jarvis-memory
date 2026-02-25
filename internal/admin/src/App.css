@@ -520,38 +520,36 @@
 .tooltip-synapses {
   border-top: 1px solid var(--border-color);
   padding-top: 0.8rem;
-  display: grid;
-  grid-auto-flow: row;
-  /* Left-to-right, then next row */
-  gap: 0 1.5rem;
+  column-gap: 1.5rem;
+  column-fill: auto;
 }
 
 .tooltip-synapses.cols-1 {
-  grid-template-columns: 1fr;
+  column-count: 1;
 }
 
 .tooltip-synapses.cols-2 {
-  grid-template-columns: repeat(2, 1fr);
+  column-count: 2;
   min-width: 400px;
 }
 
 .tooltip-synapses.cols-3 {
-  grid-template-columns: repeat(3, 1fr);
+  column-count: 3;
   min-width: 600px;
 }
 
 .tooltip-synapses.cols-4 {
-  grid-template-columns: repeat(4, 1fr);
+  column-count: 4;
   min-width: 800px;
 }
 
 .tooltip-synapses.cols-5 {
-  grid-template-columns: repeat(5, 1fr);
+  column-count: 5;
   min-width: 1000px;
 }
 
 .synapses-header {
-  grid-column: 1 / -1;
+  column-span: all;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -561,6 +559,7 @@
 }
 
 .synapse-item {
+  break-inside: avoid;
   display: flex;
   justify-content: space-between;
   align-items: center;
