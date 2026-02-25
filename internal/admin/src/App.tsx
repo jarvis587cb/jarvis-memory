@@ -344,7 +344,14 @@ function App() {
   const [data, setData] = useState<AdminData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<Tab>('seeds')
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    return (localStorage.getItem('jarvis_active_tab') as Tab) || 'seeds'
+  })
+
+  // Persist tab choice
+  useEffect(() => {
+    localStorage.setItem('jarvis_active_tab', activeTab);
+  }, [activeTab]);
 
   const fetchData = useCallback(async () => {
     setLoading(true)
