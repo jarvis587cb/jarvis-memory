@@ -384,21 +384,34 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                     <div className="tooltip-title">{hoveredNode.label}</div>
                     <div className="tooltip-content">{hoveredNode.content}</div>
 
-                    <div className="tooltip-synapses">
-                        <div className="synapses-header">Synapsen:</div>
-                        {edgesRef.current
-                            .filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id)
-                            .sort((a, b) => b.strength - a.strength)
-                            .map(e => {
-                                const target = e.source.id === hoveredNode.id ? e.target : e.source;
-                                return (
-                                    <div key={target.id} className="synapse-item">
-                                        <span className="synapse-label">{target.label}</span>
-                                        <span className="synapse-strength">{(e.strength * 100).toFixed(0)}%</span>
-                                    </div>
-                                );
-                            })}
-                    </div>
+                    {(() => {
+                        const connections = edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id);
+                        if (connections.length === 0) return null;
+
+                        // Calculate dynamic columns (1-5) based on connection count
+                        let cols = 1;
+                        if (connections.length > 40) cols = 5;
+                        else if (connections.length > 20) cols = 4;
+                        else if (connections.length > 10) cols = 3;
+                        else if (connections.length > 5) cols = 2;
+
+                        return (
+                            <div className={`tooltip-synapses cols-${cols}`}>
+                                <div className="synapses-header">Synapsen ({connections.length}):</div>
+                                {connections
+                                    .sort((a, b) => b.strength - a.strength)
+                                    .map(e => {
+                                        const target = e.source.id === hoveredNode.id ? e.target : e.source;
+                                        return (
+                                            <div key={target.id} className="synapse-item">
+                                                <span className="synapse-label">{target.label}</span>
+                                                <span className="synapse-strength">{(e.strength * 100).toFixed(0)}%</span>
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+                        );
+                    })()}
                 </div>
             )}
             <div className="neural-map-legend">
