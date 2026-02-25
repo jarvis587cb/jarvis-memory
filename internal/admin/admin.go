@@ -78,7 +78,7 @@ func (h *AdminHandler) HandleAdminData(c *echo.Context) error {
 }
 
 func (h *AdminHandler) getLatestSeeds(ctx context.Context) ([]db.Seed, error) {
-	query := `SELECT id, content, title, type, confidence, last_accessed, created_at FROM seeds ORDER BY created_at DESC LIMIT 100`
+	query := `SELECT id, content, title, type, confidence, protected, last_accessed, created_at FROM seeds ORDER BY created_at DESC LIMIT 100`
 	rows, err := h.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (h *AdminHandler) getLatestSeeds(ctx context.Context) ([]db.Seed, error) {
 	for rows.Next() {
 		var s db.Seed
 		var lastAccessed sql.NullTime
-		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &lastAccessed, &s.CreatedAt); err != nil {
+		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &s.Protected, &lastAccessed, &s.CreatedAt); err != nil {
 			return nil, err
 		}
 		if lastAccessed.Valid {
