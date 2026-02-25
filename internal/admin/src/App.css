@@ -448,7 +448,7 @@
 }
 
 .node-tooltip.wider {
-  width: 450px;
+  width: 600px;
 }
 
 @keyframes fadeIn {
@@ -497,8 +497,8 @@
 
 .wider .tooltip-synapses {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 1.5rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0 1rem;
 }
 
 .synapses-header {
@@ -524,7 +524,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 150px;
 }
 
 .synapse-strength {
