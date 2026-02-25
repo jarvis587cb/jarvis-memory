@@ -445,6 +445,8 @@
   z-index: 1000;
   animation: fadeIn 0.2s ease;
   transition: width 0.3s ease;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .node-tooltip.wider {
@@ -488,6 +490,8 @@
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 0.8rem;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .tooltip-synapses {
