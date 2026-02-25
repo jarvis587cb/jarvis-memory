@@ -293,7 +293,7 @@ function App() {
   return (
     <div className="admin-app">
       <header className="admin-header">
-        <h1>🧠 Neural Brain Admin</h1>
+        <h1>🤖 Jarvis Memory</h1>
         <div className="stats">
           <div className="stat-item">
             <span>Seeds:</span>
