@@ -442,7 +442,7 @@
   padding: 1rem;
   box-shadow: var(--shadow-lg);
   pointer-events: none;
-  z-index: 100;
+  z-index: 1000;
   animation: fadeIn 0.2s ease;
 }
 

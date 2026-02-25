@@ -29,6 +29,40 @@ interface AdminData {
   agentContexts: AgentContext[]
 }
 
+interface TooltipProps {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  x: number;
+  y: number;
+}
+
+function TableTooltip({ id, type, title, content, x, y }: TooltipProps) {
+  return (
+    <div
+      className="node-tooltip table-tooltip"
+      style={{
+        position: 'fixed',
+        left: x + 15,
+        top: y + 15,
+        right: 'auto',
+        transform: 'none',
+        pointerEvents: 'none'
+      }}
+    >
+      <div className="tooltip-header">
+        <span className={`badge badge-${type}`}>
+          {type === 'seed' ? '🌱 Seed' : '🧠 Context'}
+        </span>
+        <span className="tooltip-id">{id.slice(0, 8)}</span>
+      </div>
+      <div className="tooltip-title">{title}</div>
+      <div className="tooltip-content">{content}</div>
+    </div>
+  )
+}
+
 type Tab = 'seeds' | 'contexts' | 'map'
 type SortDir = 'asc' | 'desc'
 
@@ -139,6 +173,18 @@ const seedColumns: { key: SeedSortKey; label: string }[] = [
 function SeedsTable({ seeds }: { seeds: Seed[] }) {
   const { sort, toggle } = useSort<SeedSortKey>('created_at', 'desc')
   const sorted = useMemo(() => sortItems(seeds, sort.key, sort.dir), [seeds, sort])
+  const [hovered, setHovered] = useState<TooltipProps | null>(null)
+
+  const handleMouseMove = (e: React.MouseEvent, s: Seed) => {
+    setHovered({
+      id: s.id,
+      type: 'seed',
+      title: s.title || s.id.slice(0, 8),
+      content: s.content,
+      x: e.clientX,
+      y: e.clientY
+    })
+  }
 
   if (seeds.length === 0) {
     return (
@@ -167,9 +213,21 @@ function SeedsTable({ seeds }: { seeds: Seed[] }) {
         <tbody>
           {sorted.map(s => (
             <tr key={s.id}>
-              <td className="cell-id" title={s.id}>{s.id.slice(0, 8)}</td>
-              <td className="cell-title" title={s.title}>{s.title}</td>
-              <td className="cell-content" title={s.content}>{s.content}</td>
+              <td className="cell-id text-mono">{s.id.slice(0, 8)}</td>
+              <td
+                className="cell-title"
+                onMouseMove={(e) => handleMouseMove(e, s)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {s.title}
+              </td>
+              <td
+                className="cell-content"
+                onMouseMove={(e) => handleMouseMove(e, s)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {s.content}
+              </td>
               <td><span className="badge badge-type">{s.type}</span></td>
               <td><ConfidenceBar value={s.confidence} /></td>
               <td>
@@ -183,6 +241,7 @@ function SeedsTable({ seeds }: { seeds: Seed[] }) {
           ))}
         </tbody>
       </table>
+      {hovered && <TableTooltip {...hovered} />}
     </div>
   )
 }
@@ -200,6 +259,18 @@ const contextColumns: { key: ContextSortKey; label: string }[] = [
 function ContextsTable({ contexts }: { contexts: AgentContext[] }) {
   const { sort, toggle } = useSort<ContextSortKey>('created_at', 'desc')
   const sorted = useMemo(() => sortItems(contexts, sort.key, sort.dir), [contexts, sort])
+  const [hovered, setHovered] = useState<TooltipProps | null>(null)
+
+  const handleMouseMove = (e: React.MouseEvent, c: AgentContext) => {
+    setHovered({
+      id: c.id,
+      type: 'context',
+      title: c.agentId + ' (' + c.type + ')',
+      content: c.summary,
+      x: e.clientX,
+      y: e.clientY
+    })
+  }
 
   if (contexts.length === 0) {
     return (
@@ -229,16 +300,23 @@ function ContextsTable({ contexts }: { contexts: AgentContext[] }) {
         <tbody>
           {sorted.map(c => (
             <tr key={c.id}>
-              <td className="cell-id" title={c.id}>{c.id.slice(0, 8)}</td>
-              <td className="cell-title" title={c.agentId}>{c.agentId}</td>
+              <td className="cell-id text-mono">{c.id.slice(0, 8)}</td>
+              <td className="cell-title">{c.agentId}</td>
               <td><span className="badge badge-type">{c.type}</span></td>
-              <td className="cell-summary" title={c.summary}>{c.summary || '—'}</td>
+              <td
+                className="cell-summary"
+                onMouseMove={(e) => handleMouseMove(e, c)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {c.summary || '—'}
+              </td>
               <td className="cell-time">{formatDate(c.created_at)}</td>
               <td><MetadataCell data={c.metadata} /></td>
             </tr>
           ))}
         </tbody>
       </table>
+      {hovered && <TableTooltip {...hovered} />}
     </div>
   )
 }
