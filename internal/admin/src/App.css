@@ -512,25 +512,12 @@
 .tooltip-synapses {
   border-top: 1px solid var(--border-color);
   padding-top: 0.8rem;
-  column-gap: 1.5rem;
-  column-fill: auto;
-}
-
-.tooltip-synapses.cols-1 {
-  column-count: 1;
-}
-
-.tooltip-synapses.cols-2 {
-  column-count: 2;
-  width: 400px;
-  max-width: 100%;
-}
-
-.tooltip-synapses.cols-3 {
   column-count: 3;
+  column-gap: 1.5rem;
   width: 600px;
   max-width: 100%;
 }
+
 
 .synapses-header {
   column-span: all;

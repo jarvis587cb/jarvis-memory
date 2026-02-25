@@ -384,13 +384,8 @@ const NeuralMap: React.FC<NeuralMapProps> = ({ seeds, contexts }) => {
                         const connections = edgesRef.current.filter(e => e.source.id === hoveredNode.id || e.target.id === hoveredNode.id);
                         if (connections.length === 0) return null;
 
-                        // Calculate dynamic columns (1-3) based on connection count
-                        let cols = 1;
-                        if (connections.length > 10) cols = 3;
-                        else if (connections.length > 5) cols = 2;
-
                         return (
-                            <div className={`tooltip-synapses cols-${cols}`}>
+                            <div className="tooltip-synapses">
                                 <div className="synapses-header">Synapsen ({connections.length}):</div>
                                 {connections
                                     .sort((a, b) => b.strength - a.strength)
