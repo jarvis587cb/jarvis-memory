@@ -486,6 +486,11 @@
   line-height: 1.4;
 }
 
+.table-tooltip .tooltip-content {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .neural-map-legend {
   position: absolute;
   bottom: 1rem;

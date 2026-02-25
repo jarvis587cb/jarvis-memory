@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useLayoutEffect, useRef } from 'react'
 import NeuralMap from './NeuralMap'
 import './App.css'
 
@@ -39,16 +39,35 @@ interface TooltipProps {
 }
 
 function TableTooltip({ id, type, title, content, x, y }: TooltipProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState({ top: y + 15, left: x + 15 })
+
+  useLayoutEffect(() => {
+    if (!ref.current) return
+    const rect = ref.current.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+    let nextTop = y + 15
+
+    // If tooltip goes below viewport, flip it upward
+    if (nextTop + rect.height > viewportHeight) {
+      nextTop = y - rect.height - 15
+    }
+
+    setPos({ top: nextTop, left: x + 15 })
+  }, [x, y, content])
+
   return (
     <div
+      ref={ref}
       className="node-tooltip table-tooltip"
       style={{
         position: 'fixed',
-        left: x + 15,
-        top: y + 15,
+        left: pos.left,
+        top: pos.top,
         right: 'auto',
         transform: 'none',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        visibility: pos.top === y + 15 && y + (ref.current?.offsetHeight || 0) > window.innerHeight ? 'hidden' : 'visible'
       }}
     >
       <div className="tooltip-header">
