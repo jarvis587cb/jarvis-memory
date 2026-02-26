@@ -47,8 +47,8 @@ func (h *Handler) HandleListSeeds(c *echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	if seeds == nil {
-		seeds = []db.Seed{}
+	for i := range seeds {
+		seeds[i].Embedding = nil
 	}
 	return c.JSON(http.StatusOK, seeds)
 }
@@ -77,6 +77,7 @@ func (h *Handler) HandleCreateSeed(c *echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
+	seed.Embedding = nil
 	return c.JSON(http.StatusCreated, seed)
 }
 
@@ -161,8 +162,8 @@ func (h *Handler) HandleQuerySeeds(c *echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	if results == nil {
-		results = []db.SeedSearchResult{}
+	for i := range results {
+		results[i].Embedding = nil
 	}
 
 	return c.JSON(http.StatusOK, results)
@@ -215,6 +216,7 @@ func (h *Handler) HandleUpdateSeed(c *echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
+	seed.Embedding = nil
 	return c.JSON(http.StatusOK, seed)
 }
 
@@ -302,6 +304,7 @@ func (h *Handler) HandleCreateAgentContext(c *echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
+	ac.Embedding = nil
 	return c.JSON(http.StatusCreated, ac)
 }
 
@@ -313,8 +316,8 @@ func (h *Handler) HandleGetAgentContexts(c *echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	if results == nil {
-		results = []db.AgentContext{}
+	for i := range results {
+		results[i].Embedding = nil
 	}
 
 	return c.JSON(http.StatusOK, results)
@@ -332,5 +335,6 @@ func (h *Handler) HandleGetAgentContext(c *echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "agent context not found"})
 	}
 
+	ac.Embedding = nil
 	return c.JSON(http.StatusOK, ac)
 }

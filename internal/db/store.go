@@ -23,7 +23,7 @@ type Seed struct {
 }
 
 func (db *DB) ListSeeds(ctx context.Context, limit int) ([]Seed, error) {
-	query := `SELECT id, content, title, type, confidence, protected, last_accessed, created_at FROM seeds ORDER BY created_at DESC LIMIT $1`
+	query := `SELECT id, content, title, type, confidence, protected, last_accessed, created_at, embedding FROM seeds ORDER BY created_at DESC LIMIT $1`
 	rows, err := db.QueryContext(ctx, query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list seeds: %w", err)
@@ -33,9 +33,11 @@ func (db *DB) ListSeeds(ctx context.Context, limit int) ([]Seed, error) {
 	var seeds []Seed
 	for rows.Next() {
 		var s Seed
-		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &s.Protected, &s.LastAccessed, &s.CreatedAt); err != nil {
+		var emb pgvector.Vector
+		if err := rows.Scan(&s.ID, &s.Content, &s.Title, &s.Type, &s.Confidence, &s.Protected, &s.LastAccessed, &s.CreatedAt, &emb); err != nil {
 			return nil, err
 		}
+		s.Embedding = emb.Slice()
 		seeds = append(seeds, s)
 	}
 	return seeds, nil
@@ -155,7 +157,7 @@ func (db *DB) SearchSeeds(ctx context.Context, embedding []float32, limit int, t
 	// We also update last_accessed for returned seeds.
 	query := fmt.Sprintf(`
 		WITH matched AS (
-			SELECT id, content, title, type, confidence, last_accessed, created_at,
+			SELECT id, content, title, type, confidence, last_accessed, created_at, embedding,
 			       (1 - (embedding <=> $1)) * confidence AS similarity
 			FROM seeds
 			WHERE (1 - (embedding <=> $1)) * confidence >= $2%s
@@ -166,7 +168,7 @@ func (db *DB) SearchSeeds(ctx context.Context, embedding []float32, limit int, t
 		SET last_accessed = NOW()
 		FROM matched m
 		WHERE s.id = m.id
-		RETURNING m.id, m.content, m.title, m.type, m.confidence, m.last_accessed, m.created_at, m.similarity
+		RETURNING m.id, m.content, m.title, m.type, m.confidence, m.last_accessed, m.created_at, m.similarity, m.embedding
 	`, timeFilter)
 
 	rows, err := db.QueryContext(ctx, query, args...)
@@ -178,9 +180,11 @@ func (db *DB) SearchSeeds(ctx context.Context, embedding []float32, limit int, t
 	var results []SeedSearchResult
 	for rows.Next() {
 		var res SeedSearchResult
-		if err := rows.Scan(&res.ID, &res.Content, &res.Title, &res.Type, &res.Confidence, &res.LastAccessed, &res.CreatedAt, &res.Similarity); err != nil {
+		var emb pgvector.Vector
+		if err := rows.Scan(&res.ID, &res.Content, &res.Title, &res.Type, &res.Confidence, &res.LastAccessed, &res.CreatedAt, &res.Similarity, &emb); err != nil {
 			return nil, err
 		}
+		res.Embedding = emb.Slice()
 		results = append(results, res)
 	}
 	return results, nil
@@ -217,7 +221,7 @@ func (db *DB) InsertAgentContext(ctx context.Context, ac *AgentContext, embeddin
 }
 
 func (db *DB) GetAgentContexts(ctx context.Context, agentID string) ([]AgentContext, error) {
-	query := `SELECT id, agent_id, type, metadata, summary, created_at FROM agent_contexts`
+	query := `SELECT id, agent_id, type, metadata, summary, created_at, embedding FROM agent_contexts`
 	var args []interface{}
 
 	if agentID != "" {
@@ -238,7 +242,8 @@ func (db *DB) GetAgentContexts(ctx context.Context, agentID string) ([]AgentCont
 		var ac AgentContext
 		var meta []byte
 		var sum sql.NullString
-		if err := rows.Scan(&ac.ID, &ac.AgentID, &ac.Type, &meta, &sum, &ac.CreatedAt); err != nil {
+		var emb pgvector.Vector
+		if err := rows.Scan(&ac.ID, &ac.AgentID, &ac.Type, &meta, &sum, &ac.CreatedAt, &emb); err != nil {
 			return nil, err
 		}
 		if meta != nil {
@@ -247,17 +252,19 @@ func (db *DB) GetAgentContexts(ctx context.Context, agentID string) ([]AgentCont
 		if sum.Valid {
 			ac.Summary = sum.String
 		}
+		ac.Embedding = emb.Slice()
 		results = append(results, ac)
 	}
 	return results, nil
 }
 
 func (db *DB) GetAgentContextByID(ctx context.Context, id string) (*AgentContext, error) {
-	query := `SELECT id, agent_id, type, metadata, summary, created_at FROM agent_contexts WHERE id = $1`
+	query := `SELECT id, agent_id, type, metadata, summary, created_at, embedding FROM agent_contexts WHERE id = $1`
 	var ac AgentContext
 	var meta []byte
 	var sum sql.NullString
-	err := db.QueryRowContext(ctx, query, id).Scan(&ac.ID, &ac.AgentID, &ac.Type, &meta, &sum, &ac.CreatedAt)
+	var emb pgvector.Vector
+	err := db.QueryRowContext(ctx, query, id).Scan(&ac.ID, &ac.AgentID, &ac.Type, &meta, &sum, &ac.CreatedAt, &emb)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -270,5 +277,6 @@ func (db *DB) GetAgentContextByID(ctx context.Context, id string) (*AgentContext
 	if sum.Valid {
 		ac.Summary = sum.String
 	}
+	ac.Embedding = emb.Slice()
 	return &ac, nil
 }
