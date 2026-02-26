@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    restart: always
     ports:
       - "8080:8080"
     environment:
@@ -13,6 +14,7 @@ services:
 
   db:
     image: ankane/pgvector:v0.5.1
+    restart: always
     environment:
       POSTGRES_USER: jarvis
       POSTGRES_PASSWORD: memorypass
