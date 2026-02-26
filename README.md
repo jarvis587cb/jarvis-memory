@@ -19,10 +19,9 @@ A lightweight, purely Go-based long-term memory system for AI agents. Uses a loc
 | 💾 **Auto-Capture** | Automatically saves conversations after each AI turn (OpenClaw hook) |
 | ✏️ **Full CRUD** | Create, Read, Update, Delete seeds via REST API |
 | 🕸️ **Neural Map** | 3D-feeling interactive visualization of the memory network with Pan & Zoom |
-| 🖥️ **Admin Panel** | React dashboard with tab persistence, rich tooltips, manual table sorting, and live network graph |
+| 🖥️ **Admin Panel** | React dashboard with rich tooltips, manual table sorting, and live network graph |
 | 🐳 **Dockerized** | One-command setup with Docker Compose (Go app + Postgres/pgvector) |
 | 🔒 **100% Local** | No API keys, no external services, complete privacy |
-| 🔄 **Tab Persistence**| Remembers your active tab (Neural Map vs. Tables) across browser refreshes |
 
 ---
 
