@@ -13,6 +13,8 @@ models/gte-small.gtemodel:
 	.venv/bin/python convert_model.py models/gte-small models/gte-small.gtemodel
 
 run:
+	@echo "Building Admin Panel..."
+	cd internal/admin && npm install && npm run build
 	@echo "Starting Jarvis Memory..."
 	docker compose up -d --build
 
