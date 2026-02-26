@@ -19,9 +19,10 @@ A lightweight, purely Go-based long-term memory system for AI agents. Uses a loc
 | 💾 **Auto-Capture** | Automatically saves conversations after each AI turn (OpenClaw hook) |
 | ✏️ **Full CRUD** | Create, Read, Update, Delete seeds via REST API |
 | 🕸️ **Neural Map** | 3D-feeling interactive visualization of the memory network with Pan & Zoom |
-| 🖥️ **Admin Panel** | React dashboard with rich tooltips, manual table sorting, and live network graph |
+| 🖥️ **Admin Panel** | React dashboard with tab persistence, rich tooltips, manual table sorting, and live network graph |
 | 🐳 **Dockerized** | One-command setup with Docker Compose (Go app + Postgres/pgvector) |
 | 🔒 **100% Local** | No API keys, no external services, complete privacy |
+| 🔄 **Tab Persistence**| Remembers your active tab (Neural Map vs. Tables) across browser refreshes |
 
 ---
 
@@ -32,7 +33,7 @@ Jarvis Memory includes an interactive visualization layer that treats your seeds
 - **Synapses**: Lines (synapses) are automatically drawn between nodes that share a high semantic similarity.
 - **Interactive Graph**: A force-directed layout ensures the map remains readable and evolves as new memories are added.
 - **Pan & Zoom**: Intuitive navigation using mouse dragging and scroll wheel (zoom-to-cursor).
-- **Rich Tooltips**: Hover over any node to see its full content, metadata, and a detailed list of all its synaptic connections (sorted by similarity).
+- **Optimized Tooltips**: Hover over neurons to see a **600px wide detail panel**. Synapses are displayed in a smart **3-column layout** for maximum density and readability.
 - **Glow Effects**: Visual distinction between **Seeds** (Neurons) and **Agent Contexts** (Context Modules).
 
 ---
@@ -85,6 +86,9 @@ Open the Admin Dashboard: **http://localhost:8080/admin**
 
 **Base URL:** `http://localhost:8080`
 **Auth:** None required 🔓
+
+> [!NOTE]
+> For performance and privacy, **Embeddings are suppressed** in all public API responses (marked as `omitempty`). They are only accessible via the internal Admin API for visualization.
 
 ### 🌱 Seeds (Memory Storage)
 
